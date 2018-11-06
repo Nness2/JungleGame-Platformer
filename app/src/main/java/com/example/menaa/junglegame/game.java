@@ -45,6 +45,7 @@ public class game extends AppCompatActivity {
     private ImageView map;
     private ImageView map2;
     private ImageView obstacle;
+    private ImageView bonus;
     private ImageView man;
     private ImageView floor;
     private ImageView floor2;
@@ -57,6 +58,7 @@ public class game extends AppCompatActivity {
     private float map2LeftY;
     private float obstacleLeftX;
     private float obstacleLeftY;
+    private float bonusLeftX;
     private float floorLeftX;
     private float floor2LeftX;
 
@@ -70,6 +72,7 @@ public class game extends AppCompatActivity {
     private Timer timer4 = new Timer();
     private Rect rc1 = new Rect();
     private Rect rc2 = new Rect();
+    private Rect rc3 = new Rect();
 
 
     @Override
@@ -82,6 +85,7 @@ public class game extends AppCompatActivity {
         jump = (Button) findViewById(R.id.jump);
         brk = (Button) findViewById(R.id.brk);
         obstacle = (ImageView) findViewById(R.id.obstacle);
+        bonus = (ImageView) findViewById(R.id.bonus);
         man = (ImageView) findViewById(R.id.man);
         floor = (ImageView) findViewById(R.id.floor);
         floor2 = (ImageView) findViewById(R.id.floor2);
@@ -141,16 +145,14 @@ public class game extends AppCompatActivity {
 
 
     public void changePos(){
-
         mapLeftX -= 1;
         if (map.getX() + map.getWidth() < 0){
             mapLeftX = screenWidth-15;
         }
 
-
         map2LeftX -= 1;
         if (map2.getX() + map2.getWidth() < 0){
-            map2LeftX = screenWidth;
+            map2LeftX = screenWidth-15;
         }
         map.setX(mapLeftX);
         map.setY(mapLeftY);
@@ -159,26 +161,32 @@ public class game extends AppCompatActivity {
 
     }
 
-    public void changePos2(){
+    public void changePos2() {
         scr++;
-        score.setText("SCORE : "+Integer.toString(scr));
-        if (scr%1000 == 0){
+        score.setText("SCORE : " + Integer.toString(scr));
+        if (scr % 1000 == 0) {
             obSpeed += 1;
         }
         obstacleLeftX -= obSpeed;
+        bonusLeftX -= obSpeed;
         floorLeftX -= obSpeed;
         floor2LeftX -= obSpeed;
         if (obstacle.getX() + obstacle.getWidth() < 0)
             obstacleLeftX = screenWidth;
+        if (bonus.getX() + bonus.getWidth() < 0){
+            bonusLeftX = screenWidth;
+            bonus.setVisibility(View.VISIBLE);
+        }
         if (floor.getX() + floor.getWidth() < 0)
-            floorLeftX = screenWidth;
+            floorLeftX = screenWidth-15;
         if (floor2.getX() + floor2.getWidth() < 0)
-            floor2LeftX = screenWidth;
+            floor2LeftX = screenWidth-15;
 
         obstacle.setX(obstacleLeftX);
         obstacle.setY(obstacleLeftY);
         floor.setX(floorLeftX);
         floor2.setX(floor2LeftX);
+        bonus.setX(bonusLeftX);
     }
 
     public void changePos3(){
@@ -195,8 +203,13 @@ public class game extends AppCompatActivity {
         }
         obstacle.getHitRect(rc1);
         man.getHitRect(rc2);
+        bonus.getHitRect(rc3);
         if (Rect.intersects(rc1, rc2)) {
             finish();
+        }
+        if (Rect.intersects(rc3, rc2)) {
+            scr ++;
+            bonus.setVisibility(View.INVISIBLE);
         }
 
         man.setX(manLeftX);
@@ -236,16 +249,15 @@ public class game extends AppCompatActivity {
         map2LeftX = screenWidth;
         obstacleLeftX = screenWidth;
         obstacleLeftY = base;
+        bonusLeftX = screenWidth;
         manLeftY = base;
         manLeftX = 50;
         flag = 2;
         man.setY(manLeftY);
         man.setX(manLeftX);
 
-        floor.setY(base+85);
-        floor2.setY(base+85);
-        //floor.setX(screenWidth);
+        floor.setY(base+75);
+        floor2.setY(base+75);
+        bonus.setY(base - 350);
     }
-
-
 }
