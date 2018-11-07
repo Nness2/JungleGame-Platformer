@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btn3;
     private Button btn4;
     private Button btn5;
+    private int musicStat = 1;
     private MediaPlayer mySong;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +38,22 @@ public class MainActivity extends AppCompatActivity {
         btn3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mySong.stop();
                 finish();
+            }
+        });
+        btn4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                musicStat++;
+                if (musicStat%2 == 1){
+                    musicStat = 1;
+                    mySong.start();
+                }
+                if (musicStat%2 == 0){
+                    musicStat = 0;
+                    mySong.pause();
+                }
             }
         });
         init();

@@ -174,7 +174,7 @@ public class game extends AppCompatActivity {
         if (obstacle.getX() + obstacle.getWidth() < 0)
             obstacleLeftX = screenWidth;
         if (bonus.getX() + bonus.getWidth() < 0){
-            bonusLeftX = screenWidth;
+            bonusLeftX = screenWidth + screenWidth /2;
             bonus.setVisibility(View.VISIBLE);
         }
         if (floor.getX() + floor.getWidth() < 0)
@@ -258,6 +258,6 @@ public class game extends AppCompatActivity {
 
         floor.setY(base+75);
         floor2.setY(base+75);
-        bonus.setY(base - 350);
+        bonus.setY(base - 200);
     }
 }
