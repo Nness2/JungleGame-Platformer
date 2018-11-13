@@ -94,8 +94,18 @@ public class game extends AppCompatActivity {
         jump.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(man.getY() == base){flag = 0;}
-                man.setBackgroundResource(R.drawable.r2);
+
+                if(man.getY() == base){
+                    flag = 0;
+                    man.setBackgroundResource(R.drawable.r2);
+                }
+
+
+                else {
+                    flag = 3;
+                    man.setBackgroundResource(R.drawable.r10);
+                }
+
             }
         });
 
@@ -104,11 +114,13 @@ public class game extends AppCompatActivity {
             public void onClick(View v) {
 
                 if (state == 1) {
+                    brk.setBackgroundResource(R.drawable.play);
                     state = 0;
                     if (flag == 2)
                         man.setBackgroundResource(R.drawable.r3);
                 }
                 else{
+                    brk.setBackgroundResource(R.drawable.pause);
                     state = 1;
                     if (flag == 2) {
                         man.setBackgroundResource(R.drawable.animation);
@@ -123,6 +135,7 @@ public class game extends AppCompatActivity {
         man.setBackgroundResource(R.drawable.animation);
         run = (AnimationDrawable) man.getBackground();
         run.start();
+
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -130,10 +143,10 @@ public class game extends AppCompatActivity {
                     @Override
                     public void run() {
                         if (state == 1) {
-                            changePos();
-                            changePos2();
-                            changePos3();
-                            changePos4();
+                            mvBackGround();
+                            mvObstacle();
+                            mvJump();
+                            colision();
                         }
                     }
                 });
@@ -144,7 +157,7 @@ public class game extends AppCompatActivity {
 
 
 
-    public void changePos(){
+    public void mvBackGround(){
         mapLeftX -= 1;
         if (map.getX() + map.getWidth() < 0){
             mapLeftX = screenWidth-15;
@@ -161,7 +174,7 @@ public class game extends AppCompatActivity {
 
     }
 
-    public void changePos2() {
+    public void mvObstacle() {
         scr++;
         score.setText("SCORE : " + Integer.toString(scr));
         if (scr % 1000 == 0) {
@@ -189,7 +202,7 @@ public class game extends AppCompatActivity {
         bonus.setX(bonusLeftX);
     }
 
-    public void changePos3(){
+    public void mvJump(){
 
         if (flag == 0){
             if (manJSpeed - 0.1 > 2)  // La vitesse va descendre jusqu'à 2
@@ -201,22 +214,7 @@ public class game extends AppCompatActivity {
                 man.setBackgroundResource(R.drawable.r1);
             }
         }
-        obstacle.getHitRect(rc1);
-        man.getHitRect(rc2);
-        bonus.getHitRect(rc3);
-        if (Rect.intersects(rc1, rc2)) {
-            finish();
-        }
-        if (Rect.intersects(rc3, rc2)) {
-            scr ++;
-            bonus.setVisibility(View.INVISIBLE);
-        }
 
-        man.setX(manLeftX);
-        man.setY(manLeftY);
-    }
-
-    public void changePos4(){
         if (flag == 1) {
             if (man.getY() < base) {
                 manJSpeed += 0.1;    //Incrémentation de la vitesse (retombé)
@@ -224,19 +222,42 @@ public class game extends AppCompatActivity {
             }
             else {
                 flag = 2;
-                man.setBackgroundResource(R.drawable.animation);
-                run = (AnimationDrawable) man.getBackground();
-                run.start();
                 manLeftY = base;
                 if (manLeftY == base)
                     manJSpeed = 10;     //Réinitialisation de la vitesse
             }
         }
 
+        if (flag == 3){
+            if (man.getX() < screenWidth/3)
+                manLeftX += 10;
+            else {
+                flag = 1;
+                man.setBackgroundResource(R.drawable.animation);
+                run = (AnimationDrawable) man.getBackground();
+                run.start();
+            }
+        }
+
+        if (man.getX() > 50 && man.getY() == base)
+            manLeftX -= 1;
+
         man.setX(manLeftX);
         man.setY(manLeftY);
     }
 
+    public void colision (){
+        obstacle.getHitRect(rc1);
+        man.getHitRect(rc2);
+        bonus.getHitRect(rc3);
+
+        if (Rect.intersects(rc1, rc2))
+            finish();
+        if (Rect.intersects(rc3, rc2)) {
+            scr ++;
+            bonus.setVisibility(View.INVISIBLE);
+        }
+    }
     private void init () {
         WindowManager wm = getWindowManager();
         Display disp = wm.getDefaultDisplay();

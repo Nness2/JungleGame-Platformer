@@ -13,11 +13,11 @@ import android.widget.LinearLayout;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button btn1;
-    private Button btn2;
-    private Button btn3;
-    private Button btn4;
-    private Button btn5;
+    private Button btScore;
+    private Button btCredit;
+    private Button btLeave;
+    private Button btMusic;
+    private Button btPlay;
     private int musicStat = 1;
     private MediaPlayer mySong;
     @Override
@@ -26,33 +26,35 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //image = (ImageView) findViewById(R.id.imageView1);
-        btn1 = (Button) findViewById(R.id.btn1);
-        btn2 = (Button) findViewById(R.id.btn2);
-        btn3 = (Button) findViewById(R.id.btn3);
-        btn4 = (Button) findViewById(R.id.btn4);
-        btn5 = (Button) findViewById(R.id.btn5);
+        btScore = (Button) findViewById(R.id.btScore);
+        btCredit = (Button) findViewById(R.id.btCredit);
+        btLeave = (Button) findViewById(R.id.btLeave);
+        btMusic = (Button) findViewById(R.id.btMusic);
+        btPlay = (Button) findViewById(R.id.btPlay);
         mySong = MediaPlayer.create(MainActivity.this,R.raw.platformer);
-        btn1.setOnClickListener(btnTestListener1);
-        btn2.setOnClickListener(btnCredit);
-        btn5.setOnClickListener(btnGame);
-        btn3.setOnClickListener(new View.OnClickListener() {
+        btScore.setOnClickListener(btnTestListener1);
+        btCredit.setOnClickListener(btnCredit);
+        btPlay.setOnClickListener(btnGame);
+        btLeave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mySong.stop();
                 finish();
             }
         });
-        btn4.setOnClickListener(new View.OnClickListener() {
+        btMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 musicStat++;
                 if (musicStat%2 == 1){
                     musicStat = 1;
                     mySong.start();
+                    btMusic.setBackgroundResource(R.drawable.sound);
                 }
                 if (musicStat%2 == 0){
                     musicStat = 0;
                     mySong.pause();
+                    btMusic.setBackgroundResource(R.drawable.sound_off);
                 }
             }
         });

@@ -10,13 +10,13 @@
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg2" />
+        android:background="@drawable/bg1" />
 
     <ImageView
         android:id="@+id/map2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg2" />
+        android:background="@drawable/bg3" />
 
 
     <ImageView
@@ -79,18 +79,4 @@
         android:layout_height="200dp"
         android:background="@drawable/floor"/>
 
-    <Button
-        android:id="@+id/btn4"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="4dp"
-        android:background="@drawable/setting"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="@+id/obstacle"
-    app:layout_constraintVertical_bias="1.0" />
 </android.support.constraint.ConstraintLayout>
