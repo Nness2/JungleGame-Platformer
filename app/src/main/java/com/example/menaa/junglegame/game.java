@@ -62,14 +62,11 @@ public class game extends AppCompatActivity {
     private float floorLeftX;
     private float floor2LeftX;
 
-    private float manLeftX;
-    private float manLeftY;
+    private float manX;
+    private float manY;
 
     private Handler handler = new Handler();
     private Timer timer = new Timer();
-    private Timer timer2 = new Timer();
-    private Timer timer3 = new Timer();
-    private Timer timer4 = new Timer();
     private Rect rc1 = new Rect();
     private Rect rc2 = new Rect();
     private Rect rc3 = new Rect();
@@ -89,8 +86,7 @@ public class game extends AppCompatActivity {
         man = (ImageView) findViewById(R.id.man);
         floor = (ImageView) findViewById(R.id.floor);
         floor2 = (ImageView) findViewById(R.id.floor2);
-        //map2.setX(-80.0f);
-        //map2.setY(-80.0f);
+
         jump.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -131,7 +127,6 @@ public class game extends AppCompatActivity {
             }
         });
 
-        man = (ImageView) findViewById(R.id.man);
         man.setBackgroundResource(R.drawable.animation);
         run = (AnimationDrawable) man.getBackground();
         run.start();
@@ -208,7 +203,7 @@ public class game extends AppCompatActivity {
             if (manJSpeed - 0.1 > 2)  // La vitesse va descendre jusqu'à 2
                 manJSpeed -= 0.1;     // Décrementation de la vitesse
             if (man.getY() > base - 350)
-                manLeftY -= manJSpeed;
+                manY -= manJSpeed;
             else {
                 flag = 1;
                 man.setBackgroundResource(R.drawable.r1);
@@ -218,19 +213,22 @@ public class game extends AppCompatActivity {
         if (flag == 1) {
             if (man.getY() < base) {
                 manJSpeed += 0.1;    //Incrémentation de la vitesse (retombé)
-                manLeftY += manJSpeed;
+                manY += manJSpeed;
             }
             else {
                 flag = 2;
-                manLeftY = base;
-                if (manLeftY == base)
+                man.setBackgroundResource(R.drawable.animation);
+                run = (AnimationDrawable) man.getBackground();
+                run.start();
+                manY = base;
+                if (manY == base)
                     manJSpeed = 10;     //Réinitialisation de la vitesse
             }
         }
 
         if (flag == 3){
             if (man.getX() < screenWidth/3)
-                manLeftX += 10;
+                manX += 10;
             else {
                 flag = 1;
                 man.setBackgroundResource(R.drawable.animation);
@@ -240,10 +238,10 @@ public class game extends AppCompatActivity {
         }
 
         if (man.getX() > 50 && man.getY() == base)
-            manLeftX -= 1;
+            manX -= 1;
 
-        man.setX(manLeftX);
-        man.setY(manLeftY);
+        man.setX(manX);
+        man.setY(manY);
     }
 
     public void colision (){
@@ -271,11 +269,11 @@ public class game extends AppCompatActivity {
         obstacleLeftX = screenWidth;
         obstacleLeftY = base;
         bonusLeftX = screenWidth;
-        manLeftY = base;
-        manLeftX = 50;
+        manY = base;
+        manX = 50;
         flag = 2;
-        man.setY(manLeftY);
-        man.setX(manLeftX);
+        man.setY(manY);
+        man.setX(manX);
 
         floor.setY(base+75);
         floor2.setY(base+75);
