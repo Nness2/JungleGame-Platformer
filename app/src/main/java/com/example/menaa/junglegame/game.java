@@ -49,8 +49,13 @@ public class game extends AppCompatActivity {
     private ImageView man;
     private ImageView floor;
     private ImageView floor2;
+    private ImageView menu;
+    private Button back;
+    private Button sound;
+    private MediaPlayer mySong;
     private int base;
     private int state = 1;
+    private int musicStat = 1;
 
     private  float mapLeftX, mapLeftY, map2LeftX, map2LeftY;
     private float obstacleLeftX;
@@ -78,12 +83,17 @@ public class game extends AppCompatActivity {
         map2 = (ImageView) findViewById(R.id.map2);
         jump = (Button) findViewById(R.id.jump);
         brk = (Button) findViewById(R.id.brk);
+        back = (Button) findViewById(R.id.back);
+        sound = (Button) findViewById(R.id.sound);
         obstacle = (ImageView) findViewById(R.id.obstacle);
         bonus = (ImageView) findViewById(R.id.bonus);
         man = (ImageView) findViewById(R.id.man);
         floor = (ImageView) findViewById(R.id.floor);
         floor2 = (ImageView) findViewById(R.id.floor2);
-
+        menu = (ImageView) findViewById(R.id.menu);
+        mySong = MediaPlayer.create(game.this,R.raw.platformer);
+        mySong.start();
+        init();
         jump.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,17 +112,51 @@ public class game extends AppCompatActivity {
             }
         });
 
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mySong.stop();
+                finish();
+
+
+            }
+        });
+
+        sound.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                musicStat++;
+                if (musicStat%2 == 1){
+                    musicStat = 1;
+                    mySong.start();
+                    sound.setBackgroundResource(R.drawable.sound);
+                }
+                if (musicStat%2 == 0){
+                    musicStat = 0;
+                    mySong.pause();
+                    sound.setBackgroundResource(R.drawable.sound_off);
+                }
+            }
+        });
+
         brk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 if (state == 1) {
+                    menu.setVisibility(View.VISIBLE);
+                    back.setVisibility(View.VISIBLE);
+                    sound.setVisibility(View.VISIBLE);
                     brk.setBackgroundResource(R.drawable.play);
+
                     state = 0;
                     if (flag == 2)
                         man.setBackgroundResource(R.drawable.r3);
                 }
                 else{
+                    menu.setVisibility(View.INVISIBLE);
+                    back.setVisibility(View.INVISIBLE);
+                    sound.setVisibility(View.INVISIBLE);
                     brk.setBackgroundResource(R.drawable.pause);
                     state = 1;
                 }
@@ -135,7 +179,7 @@ public class game extends AppCompatActivity {
                 });
             }
         }, 0, 10);
-        init();
+
     }
 
 
@@ -210,7 +254,7 @@ public class game extends AppCompatActivity {
                     manJSpeed = 10;     //Réinitialisation de la vitesse
             }
         }
-        
+
         if (flag == 2 && isRun == 0){
             isRun = 1;
             man.setBackgroundResource(R.drawable.animation);
@@ -262,6 +306,11 @@ public class game extends AppCompatActivity {
         flag = 2;
         man.setY(manY);
         man.setX(manX);
+        back.setX(screenWidth/3);
+        sound.setX(screenWidth/2);
+        menu.setVisibility(View.INVISIBLE);
+        back.setVisibility(View.INVISIBLE);
+        sound.setVisibility(View.INVISIBLE);
 
         floor.setY(base+75);
         floor2.setY(base+75);

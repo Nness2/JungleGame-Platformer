@@ -59,10 +59,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         init();
-        mySong.start();
     }
     private void init () {
-
+        mySong.start();
     }
 
     private View.OnClickListener btnCredit = new View.OnClickListener() {
@@ -76,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private View.OnClickListener btnGame = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            mySong.stop();
             Intent gameActivity = new Intent(MainActivity.this, game.class);
             startActivity(gameActivity);
         }
