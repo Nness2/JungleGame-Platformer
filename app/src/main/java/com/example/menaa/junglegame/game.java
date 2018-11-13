@@ -34,10 +34,10 @@ public class game extends AppCompatActivity {
     private int screenWidth;
     private int screenHeight;
 
-    private  int cmp = 0;
     private  float manJSpeed = 10;
     private  int obSpeed = 5;
     private int flag;
+    private int isRun = 0;
     private TextView score;
     private int scr;
     private Button jump;
@@ -52,10 +52,7 @@ public class game extends AppCompatActivity {
     private int base;
     private int state = 1;
 
-    private  float mapLeftX;
-    private  float mapLeftY;
-    private float map2LeftX;
-    private float map2LeftY;
+    private  float mapLeftX, mapLeftY, map2LeftX, map2LeftY;
     private float obstacleLeftX;
     private float obstacleLeftY;
     private float bonusLeftX;
@@ -91,11 +88,11 @@ public class game extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                isRun = 0;
                 if(man.getY() == base){
                     flag = 0;
                     man.setBackgroundResource(R.drawable.r2);
                 }
-
 
                 else {
                     flag = 3;
@@ -118,18 +115,9 @@ public class game extends AppCompatActivity {
                 else{
                     brk.setBackgroundResource(R.drawable.pause);
                     state = 1;
-                    if (flag == 2) {
-                        man.setBackgroundResource(R.drawable.animation);
-                        run = (AnimationDrawable) man.getBackground();
-                        run.start();
-                    }
                 }
             }
         });
-
-        man.setBackgroundResource(R.drawable.animation);
-        run = (AnimationDrawable) man.getBackground();
-        run.start();
 
         timer.schedule(new TimerTask() {
             @Override
@@ -217,24 +205,24 @@ public class game extends AppCompatActivity {
             }
             else {
                 flag = 2;
-                man.setBackgroundResource(R.drawable.animation);
-                run = (AnimationDrawable) man.getBackground();
-                run.start();
                 manY = base;
                 if (manY == base)
                     manJSpeed = 10;     //Réinitialisation de la vitesse
             }
         }
+        
+        if (flag == 2 && isRun == 0){
+            isRun = 1;
+            man.setBackgroundResource(R.drawable.animation);
+            run = (AnimationDrawable) man.getBackground();
+            run.start();
+        }
 
         if (flag == 3){
             if (man.getX() < screenWidth/3)
                 manX += 10;
-            else {
+            else
                 flag = 1;
-                man.setBackgroundResource(R.drawable.animation);
-                run = (AnimationDrawable) man.getBackground();
-                run.start();
-            }
         }
 
         if (man.getX() > 50 && man.getY() == base)
