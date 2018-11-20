@@ -4,9 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".credit"
-    android:background="@drawable/bg2"
-    >
+    tools:context=".score"
+    android:background="@drawable/bg2">
 
     <TextView
         android:id="@+id/scrd"
@@ -15,14 +14,23 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:text="Vanja Plavsic
-Aness Menaa
-Kevin Harvanek"
+        android:text="TextView"
         android:textSize="50dp"
         android:textColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
+    <Button
+        android:id="@+id/reset"
+        android:layout_width="119dp"
+        android:layout_height="92dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="28dp"
+        android:background="@drawable/scorea"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent" />
 </android.support.constraint.ConstraintLayout>

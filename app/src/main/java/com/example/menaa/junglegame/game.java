@@ -1,5 +1,6 @@
 package com.example.menaa.junglegame;
 
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -18,12 +19,18 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOError;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.AnnotatedElement;
+import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -56,6 +63,7 @@ public class game extends AppCompatActivity {
     private int base;
     private int state = 1;
     private int musicStat = 1;
+    private int[] tab = new int[10];
 
     private  float mapLeftX, mapLeftY, map2LeftX, map2LeftY;
     private float obstacleLeftX;
@@ -63,6 +71,8 @@ public class game extends AppCompatActivity {
     private float bonusLeftX;
     private float floorLeftX;
     private float floor2LeftX;
+    private String FILENAME = "memo";
+    private LinkedList<String> data = new LinkedList<String>();
 
     private float manX;
     private float manY;
@@ -91,8 +101,8 @@ public class game extends AppCompatActivity {
         floor = (ImageView) findViewById(R.id.floor);
         floor2 = (ImageView) findViewById(R.id.floor2);
         menu = (ImageView) findViewById(R.id.menu);
-        mySong = MediaPlayer.create(game.this,R.raw.platformer);
-        mySong.start();
+        //mySong = MediaPlayer.create(game.this,R.raw.platformer);
+        //mySong.start();
         init();
         jump.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,10 +125,8 @@ public class game extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mySong.stop();
+                //mySong.stop();
                 finish();
-
-
             }
         });
 
@@ -128,12 +136,12 @@ public class game extends AppCompatActivity {
                 musicStat++;
                 if (musicStat%2 == 1){
                     musicStat = 1;
-                    mySong.start();
+                    //mySong.start();
                     sound.setBackgroundResource(R.drawable.sound);
                 }
                 if (musicStat%2 == 0){
                     musicStat = 0;
-                    mySong.pause();
+                    //mySong.pause();
                     sound.setBackgroundResource(R.drawable.sound_off);
                 }
             }
@@ -195,9 +203,7 @@ public class game extends AppCompatActivity {
             map2LeftX = screenWidth-15;
         }
         map.setX(mapLeftX);
-        map.setY(mapLeftY);
         map2.setX(map2LeftX);
-        map2.setY(map2LeftY);
 
     }
 
@@ -223,7 +229,6 @@ public class game extends AppCompatActivity {
             floor2LeftX = screenWidth-15;
 
         obstacle.setX(obstacleLeftX);
-        obstacle.setY(obstacleLeftY);
         floor.setX(floorLeftX);
         floor2.setX(floor2LeftX);
         bonus.setX(bonusLeftX);
@@ -238,11 +243,11 @@ public class game extends AppCompatActivity {
                 manY -= manJSpeed;
             else {
                 flag = 1;
-                man.setBackgroundResource(R.drawable.r1);
             }
         }
 
         if (flag == 1) {
+            man.setBackgroundResource(R.drawable.r1);
             if (man.getY() < base) {
                 manJSpeed += 0.1;    //Incrémentation de la vitesse (retombé)
                 manY += manJSpeed;
@@ -276,19 +281,51 @@ public class game extends AppCompatActivity {
         man.setY(manY);
     }
 
+    public int sort (){
+        int index = 0;
+        int mini = tab[0];
+        for (int i = 0 ; i < 5 ; i++){
+            if (tab[i] == 0){
+                index = i;
+                break;
+            }
+            if (mini > tab[i]){
+                mini = tab[i];
+                index = i;
+            }
+        }
+        return index;
+    }
+
     public void colision (){
         obstacle.getHitRect(rc1);
         man.getHitRect(rc2);
         bonus.getHitRect(rc3);
 
-        if (Rect.intersects(rc1, rc2))
+        if (Rect.intersects(rc1, rc2)){
+            state = 0;
+            if (tab[sort()] < scr)
+                tab[sort()] = scr;
+            data.clear();
+            for (int i = 0 ; i < 5 ; i++)
+                data.add(new String(tab[i]+"\n"));
+
+            saveData();
             finish();
+        }
+
         if (Rect.intersects(rc3, rc2)) {
             scr ++;
             bonus.setVisibility(View.INVISIBLE);
         }
     }
+
+    //public void sort (){
+    //    for
+    //}
+
     private void init () {
+        getScore();
         WindowManager wm = getWindowManager();
         Display disp = wm.getDefaultDisplay();
         Point size = new Point();
@@ -298,7 +335,7 @@ public class game extends AppCompatActivity {
         base = screenHeight/2+150;
         floor2LeftX = screenWidth;
         map2LeftX = screenWidth;
-        obstacleLeftX = screenWidth;
+        obstacleLeftX = screenWidth*2;
         obstacleLeftY = base;
         bonusLeftX = screenWidth;
         manY = base;
@@ -315,5 +352,46 @@ public class game extends AppCompatActivity {
         floor.setY(base+75);
         floor2.setY(base+75);
         bonus.setY(base - 200);
+        obstacle.setY(obstacleLeftY);
+    }
+
+
+    public void saveData() {
+        FileOutputStream fos;
+        try {
+            fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            for (String str : data) {
+                fos.write(str.getBytes());
+            }
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int getInt(String s){
+        return Integer.parseInt(s.replaceAll("[\\D]", ""));
+    }
+
+    private void getScore(){
+        int cmp = 0;
+
+        try {
+            InputStream fis = openFileInput(FILENAME);
+            BufferedReader r = new BufferedReader(new InputStreamReader(fis));
+
+            String line;
+            while ((line = r.readLine()) != null) {
+                tab[cmp] = getInt(line);
+                cmp++;
+            }
+            fis.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

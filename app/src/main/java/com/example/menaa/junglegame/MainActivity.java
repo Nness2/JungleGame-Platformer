@@ -1,5 +1,6 @@
 package com.example.menaa.junglegame;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
@@ -11,6 +12,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.LinkedList;
+
 public class MainActivity extends AppCompatActivity {
 
     private Button btScore;
@@ -20,6 +26,10 @@ public class MainActivity extends AppCompatActivity {
     private Button btPlay;
     private int musicStat = 1;
     private MediaPlayer mySong;
+    private String FILENAME = "memo";
+    private LinkedList<String> data = new LinkedList<String>();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,36 +42,33 @@ public class MainActivity extends AppCompatActivity {
         btMusic = (Button) findViewById(R.id.btMusic);
         btPlay = (Button) findViewById(R.id.btPlay);
         mySong = MediaPlayer.create(MainActivity.this,R.raw.platformer);
-        btScore.setOnClickListener(btnTestListener1);
+        btScore.setOnClickListener(btnScore);
         btCredit.setOnClickListener(btnCredit);
         btPlay.setOnClickListener(btnGame);
         btLeave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mySong.stop();
                 finish();
             }
         });
+        init();
+        //initFile();
         btMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 musicStat++;
                 if (musicStat%2 == 1){
                     musicStat = 1;
-                    mySong.start();
                     btMusic.setBackgroundResource(R.drawable.sound);
                 }
                 if (musicStat%2 == 0){
                     musicStat = 0;
-                    mySong.pause();
                     btMusic.setBackgroundResource(R.drawable.sound_off);
                 }
             }
         });
-        init();
     }
     private void init () {
-        mySong.start();
     }
 
     private View.OnClickListener btnCredit = new View.OnClickListener() {
@@ -72,21 +79,46 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private View.OnClickListener btnScore = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent scoreActivity = new Intent(MainActivity.this, score.class);
+            startActivity(scoreActivity);
+        }
+    };
+
     private View.OnClickListener btnGame = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            mySong.stop();
             Intent gameActivity = new Intent(MainActivity.this, game.class);
             startActivity(gameActivity);
         }
     };
 
-    private View.OnClickListener btnTestListener1 = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Log.i("DEBUG", "CLIQUttE BUTTON");
+
+
+    private void initFile(){
+        for (int i = 0 ; i < 5 ; i++){
+            data.add(new String(0+"\n"));
         }
-    };
+        saveData();
+    }
+
+    public void saveData() {
+        FileOutputStream fos;
+        try {
+            fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            for (String str : data) {
+                fos.write(str.getBytes());
+            }
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 }
