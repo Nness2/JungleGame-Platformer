@@ -2,13 +2,13 @@
 <animation-list xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:drawable="@drawable/r5"
+        android:drawable="@drawable/n5"
         android:duration="150"/>
     <item
-        android:drawable="@drawable/r6"
+        android:drawable="@drawable/n6"
         android:duration="150"/>
     <item
-        android:drawable="@drawable/r7"
+        android:drawable="@drawable/n7"
         android:duration="150"/>
 
 

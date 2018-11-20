@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btLeave;
     private Button btMusic;
     private Button btPlay;
+    private Button btPlayh;
     private int musicStat = 1;
     private MediaPlayer mySong;
     private String FILENAME = "memo";
@@ -41,10 +42,12 @@ public class MainActivity extends AppCompatActivity {
         btLeave = (Button) findViewById(R.id.btLeave);
         btMusic = (Button) findViewById(R.id.btMusic);
         btPlay = (Button) findViewById(R.id.btPlay);
+        btPlayh = (Button) findViewById(R.id.btPlayh);
         mySong = MediaPlayer.create(MainActivity.this,R.raw.platformer);
         btScore.setOnClickListener(btnScore);
         btCredit.setOnClickListener(btnCredit);
         btPlay.setOnClickListener(btnGame);
+        btPlayh.setOnClickListener(btnGameHard);
         btLeave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,6 +98,13 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private View.OnClickListener btnGameHard = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent gamehActivity = new Intent(MainActivity.this, gamehard.class);
+            startActivity(gamehActivity);
+        }
+    };
 
 
     private void initFile(){

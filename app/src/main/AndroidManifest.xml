@@ -18,7 +18,8 @@
         </activity>
         <activity android:name=".game" />
         <activity android:name=".credit" />
-        <activity android:name=".score"></activity>
+        <activity android:name=".score" />
+        <activity android:name=".gamehard"></activity>
     </application>
 
 </manifest>
