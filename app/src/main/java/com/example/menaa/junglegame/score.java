@@ -101,12 +101,9 @@ public class score extends AppCompatActivity {
         boolean permut;
 
         do {
-            // hypothèse : le tabInt est trié
             permut = false;
             for (int i = 0; i < longueur - 1; i++) {
-                // Teste si 2 éléments successifs sont dans le bon ordre ou non
                 if (tabInt[i] < tabInt[i + 1]) {
-                    // s'ils ne le sont pas, on échange leurs positions
                     tampon = tabInt[i];
                     tabInt[i] = tabInt[i + 1];
                     tabInt[i + 1] = tampon;

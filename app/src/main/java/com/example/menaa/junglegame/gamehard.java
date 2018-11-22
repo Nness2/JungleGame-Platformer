@@ -211,7 +211,7 @@ public class gamehard extends AppCompatActivity {
     public void mvObstacle() {
         scr++;
         score.setText("SCORE : " + Integer.toString(scr));
-        if (scr % 1000 == 0) {
+        if (scr % 500 == 0) {
             obSpeed += 1;
         }
         obstacleLeftX -= obSpeed;
@@ -224,10 +224,15 @@ public class gamehard extends AppCompatActivity {
             bonusLeftX = screenWidth + screenWidth /2;
             bonus.setVisibility(View.VISIBLE);
         }
-        if (floor.getX() + floor.getWidth() < 0)
+        if (floor.getX() + floor.getWidth() < 0){
+            floor2LeftX = 0;
             floorLeftX = screenWidth-15;
-        if (floor2.getX() + floor2.getWidth() < 0)
+        }
+
+        if (floor2.getX() + floor2.getWidth() < 0){
             floor2LeftX = screenWidth-15;
+            floorLeftX = 0;
+        }
 
         obstacle.setX(obstacleLeftX);
         floor.setX(floorLeftX);

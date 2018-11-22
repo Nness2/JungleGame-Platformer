@@ -12,6 +12,7 @@ import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -31,101 +32,83 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.AnnotatedElement;
 import java.util.LinkedList;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class game extends AppCompatActivity {
     AnimationDrawable run;
-    private ImageView img;
+    AnimationDrawable runEnemy;
+
+    private Object man;
+    private Object bonus;
+    private Object enemy;
+    private Object obstacle;
+    private Object map2;
+    private Object floor;
+    private Object floor2;
+    private Object map;
 
     private int screenWidth;
     private int screenHeight;
-
-    private  float manJSpeed = 10;
-    private  int obSpeed = 5;
+    private float manJSpeed = 10;
+    private int obSpeed = 5;
     private int flag;
     private int isRun = 0;
     private TextView score;
     private int scr;
-    private Button jump;
-    private Button brk;
-    private ImageView map;
-    private ImageView map2;
-    private ImageView obstacle;
-    private ImageView bonus;
-    private ImageView man;
-    private ImageView floor;
-    private ImageView floor2;
     private ImageView menu;
-    private Button back;
-    private Button sound;
     private MediaPlayer mySong;
+    private Random rand = new Random();
     private int base;
     private int state = 1;
-    private int musicStat = 1;
+    private int musicState = 1;
+    private int scoreState = 1;
     private int[] tab = new int[10];
-
-    private  float mapLeftX, mapLeftY, map2LeftX, map2LeftY;
-    private float obstacleLeftX;
-    private float obstacleLeftY;
-    private float bonusLeftX;
-    private float floorLeftX;
-    private float floor2LeftX;
     private String FILENAME = "memo";
     private LinkedList<String> data = new LinkedList<String>();
-
-    private float manX;
-    private float manY;
-
     private Handler handler = new Handler();
     private Timer timer = new Timer();
     private Rect rc1 = new Rect();
     private Rect rc2 = new Rect();
     private Rect rc3 = new Rect();
+    private Rect rc4 = new Rect();
+    private Button back;
+    private Button sound;
+    private Button jump;
+    private Button brk;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-        map = (ImageView) findViewById(R.id.map);
+
         score = (TextView) findViewById(R.id.score);
-        map2 = (ImageView) findViewById(R.id.map2);
         jump = (Button) findViewById(R.id.jump);
         brk = (Button) findViewById(R.id.brk);
         back = (Button) findViewById(R.id.back);
         sound = (Button) findViewById(R.id.sound);
-        obstacle = (ImageView) findViewById(R.id.obstacle);
-        bonus = (ImageView) findViewById(R.id.bonus);
-        man = (ImageView) findViewById(R.id.man);
-        floor = (ImageView) findViewById(R.id.floor);
-        floor2 = (ImageView) findViewById(R.id.floor2);
         menu = (ImageView) findViewById(R.id.menu);
-        //mySong = MediaPlayer.create(game.this,R.raw.platformer);
-        //mySong.start();
+        mySong = MediaPlayer.create(game.this,R.raw.platformer);
+
         init();
         jump.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 isRun = 0;
-                if(man.getY() == base){
+                if(man.img.getY() == base)
                     flag = 0;
-                    man.setBackgroundResource(R.drawable.r2);
-                }
 
-                else {
+                else
                     flag = 3;
-                    man.setBackgroundResource(R.drawable.r10);
-                }
-
             }
         });
 
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //mySong.stop();
                 finish();
             }
         });
@@ -133,15 +116,15 @@ public class game extends AppCompatActivity {
         sound.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                musicStat++;
-                if (musicStat%2 == 1){
-                    musicStat = 1;
-                    //mySong.start();
+                musicState++;
+                if (musicState%2 == 1){
+                    musicState = 1;
+                    mySong.start();
                     sound.setBackgroundResource(R.drawable.sound);
                 }
-                if (musicStat%2 == 0){
-                    musicStat = 0;
-                    //mySong.pause();
+                if (musicState%2 == 0){
+                    musicState = 0;
+                    mySong.pause();
                     sound.setBackgroundResource(R.drawable.sound_off);
                 }
             }
@@ -158,8 +141,10 @@ public class game extends AppCompatActivity {
                     brk.setBackgroundResource(R.drawable.play);
 
                     state = 0;
-                    if (flag == 2)
-                        man.setBackgroundResource(R.drawable.r3);
+                    if (flag == 2) {
+                        man.img.setBackgroundResource(R.drawable.r3);
+                        isRun = 0;
+                    }
                 }
                 else{
                     menu.setVisibility(View.INVISIBLE);
@@ -180,9 +165,9 @@ public class game extends AppCompatActivity {
                         if (state == 1) {
                             mvBackGround();
                             mvObstacle();
-                            mvJump();
                             colision();
                         }
+                        mvJump();
                     }
                 });
             }
@@ -190,98 +175,126 @@ public class game extends AppCompatActivity {
 
     }
 
-
-
-    public void mvBackGround(){
-        mapLeftX -= 1;
-        if (map.getX() + map.getWidth() < 0){
-            mapLeftX = screenWidth-15;
+    private void mvBackGround(){
+        map.x -= 1;
+        if (map.img.getX() + map.img.getWidth() < 0){
+            map.x = screenWidth-15;
         }
 
-        map2LeftX -= 1;
-        if (map2.getX() + map2.getWidth() < 0){
-            map2LeftX = screenWidth-15;
+        map2.x -= 1;
+        if (map2.img.getX() + map2.img.getWidth() < 0){
+            map2.x = screenWidth-15;
         }
-        map.setX(mapLeftX);
-        map2.setX(map2LeftX);
+        map.img.setX(map.x);
+        map2.img.setX(map2.x);
 
     }
 
-    public void mvObstacle() {
+    private void mvObstacle() {
         scr++;
         score.setText("SCORE : " + Integer.toString(scr));
         if (scr % 1000 == 0) {
             obSpeed += 1;
         }
-        obstacleLeftX -= obSpeed;
-        bonusLeftX -= obSpeed;
-        floorLeftX -= obSpeed;
-        floor2LeftX -= obSpeed;
-        if (obstacle.getX() + obstacle.getWidth() < 0)
-            obstacleLeftX = screenWidth;
-        if (bonus.getX() + bonus.getWidth() < 0){
-            bonusLeftX = screenWidth + screenWidth /2;
-            bonus.setVisibility(View.VISIBLE);
-        }
-        if (floor.getX() + floor.getWidth() < 0)
-            floorLeftX = screenWidth-15;
-        if (floor2.getX() + floor2.getWidth() < 0)
-            floor2LeftX = screenWidth-15;
+        obstacle.x -= obSpeed;
+        bonus.x -= obSpeed;
+        enemy.x -= obSpeed;
+        floor.x -= obSpeed;
+        floor2.x -= obSpeed;
+        if (obstacle.img.getX() + obstacle.img.getWidth() < 0)
+            obstacle.x = screenWidth;
 
-        obstacle.setX(obstacleLeftX);
-        floor.setX(floorLeftX);
-        floor2.setX(floor2LeftX);
-        bonus.setX(bonusLeftX);
+        if (bonus.img.getX() + bonus.img.getWidth() < 0){
+            bonus.x = screenWidth + (((rand.nextInt(2)+1)*screenWidth));
+            bonus.img.setBackgroundResource(R.drawable.d1);
+            scoreState = 1;
+        }
+
+        if (enemy.img.getX() + enemy.img.getWidth() < 0){
+            enemy.x = screenWidth + (((rand.nextInt(5)+3)*screenWidth));
+        }
+
+        if (floor.img.getX() + floor.img.getWidth() < 0){
+            floor2.x = 0;
+            floor.x = screenWidth-15;
+        }
+
+        if (floor2.img.getX() + floor2.img.getWidth() < 0){
+            floor2.x = screenWidth-15;
+            floor.x = 0;
+        }
+
+        enemy.img.setX(enemy.x);
+        obstacle.img.setX(obstacle.x);
+        floor.img.setX(floor.x);
+        floor2.img.setX(floor2.x);
+        bonus.img.setX(bonus.x);
     }
 
-    public void mvJump(){
+    private void mvJump(){
 
         if (flag == 0){
+            man.img.setBackgroundResource(R.drawable.r2);
             if (manJSpeed - 0.1 > 2)  // La vitesse va descendre jusqu'à 2
                 manJSpeed -= 0.1;     // Décrementation de la vitesse
-            if (man.getY() > base - 350)
-                manY -= manJSpeed;
+            if (man.img.getY() > base - 350)
+                man.y -= manJSpeed;
             else {
                 flag = 1;
             }
         }
 
         if (flag == 1) {
-            man.setBackgroundResource(R.drawable.r1);
-            if (man.getY() < base) {
+            man.img.setBackgroundResource(R.drawable.r1);
+            if (man.img.getY() < base) {
                 manJSpeed += 0.1;    //Incrémentation de la vitesse (retombé)
-                manY += manJSpeed;
+                man.y += manJSpeed;
             }
             else {
                 flag = 2;
-                manY = base;
-                if (manY == base)
+                man.y = base;
+                if (man.y == base)
                     manJSpeed = 10;     //Réinitialisation de la vitesse
             }
         }
 
         if (flag == 2 && isRun == 0){
             isRun = 1;
-            man.setBackgroundResource(R.drawable.animation);
-            run = (AnimationDrawable) man.getBackground();
+            man.img.setBackgroundResource(R.drawable.animation);
+            run = (AnimationDrawable) man.img.getBackground();
             run.start();
         }
 
         if (flag == 3){
-            if (man.getX() < screenWidth/3)
-                manX += 10;
+            man.img.setBackgroundResource(R.drawable.r10);
+            if (man.img.getX() < screenWidth/3)
+                man.x += 10;
             else
                 flag = 1;
         }
 
-        if (man.getX() > 50 && man.getY() == base)
-            manX -= 1;
+        if (man.img.getX() > 50 && man.img.getY() == base)
+            man.x -= 1;
 
-        man.setX(manX);
-        man.setY(manY);
+        if (flag == 4) {
+            man.img.setBackgroundResource(R.drawable.r4);
+            if (man.y > base - 150)
+                man.y -= 5;
+            else
+                flag = 5;
+        }
+
+        if (flag == 5){
+            man.y += 5;
+            if (man.y > screenHeight)
+                finish();
+        }
+
+        man.img.setX(man.x);
+        man.img.setY(man.y);
     }
 
-    public int sort (){
+    private int sort (){
         int index = 0;
         int mini = tab[0];
         for (int i = 0 ; i < 5 ; i++){
@@ -297,32 +310,31 @@ public class game extends AppCompatActivity {
         return index;
     }
 
-    public void colision (){
-        obstacle.getHitRect(rc1);
-        man.getHitRect(rc2);
-        bonus.getHitRect(rc3);
+    private void colision (){
+        obstacle.img.getHitRect(rc1);
+        man.img.getHitRect(rc2);
+        bonus.img.getHitRect(rc3);
+        enemy.img.getHitRect(rc4);
 
-        if (Rect.intersects(rc1, rc2)){
+        if (Rect.intersects(rc1, rc2) || Rect.intersects(rc2, rc4)){
             state = 0;
             if (tab[sort()] < scr)
                 tab[sort()] = scr;
             data.clear();
             for (int i = 0 ; i < 5 ; i++)
                 data.add(new String(tab[i]+"\n"));
-
             saveData();
-            finish();
+            flag = 4;
         }
 
         if (Rect.intersects(rc3, rc2)) {
-            scr ++;
-            bonus.setVisibility(View.INVISIBLE);
+            if (scoreState == 1){
+                scr += 100;
+                scoreState = 0;
+            }
+            bonus.img.setBackgroundResource(R.drawable.cent);
         }
     }
-
-    //public void sort (){
-    //    for
-    //}
 
     private void init () {
         getScore();
@@ -332,31 +344,42 @@ public class game extends AppCompatActivity {
         disp.getSize(size);
         screenWidth = size.x;
         screenHeight = size.y;
-        base = screenHeight/2+150;
-        floor2LeftX = screenWidth;
-        map2LeftX = screenWidth;
-        obstacleLeftX = screenWidth*2;
-        obstacleLeftY = base;
-        bonusLeftX = screenWidth;
-        manY = base;
-        manX = 50;
+        base = screenHeight-300;
+
+        man = new Object(50, base, (ImageView) findViewById(R.id.man));
+        map = new Object(0, 0, (ImageView) findViewById(R.id.map));
+        map2 = new Object(screenWidth, 0, (ImageView) findViewById(R.id.map2));
+        floor = new Object(0, base+75, (ImageView) findViewById(R.id.floor));
+        floor2 = new Object(screenWidth, base+75, (ImageView) findViewById(R.id.floor2));
+        obstacle = new Object(screenWidth*2, base, (ImageView) findViewById(R.id.obstacle));
+        bonus = new Object( (((rand.nextInt(2)+2)*screenWidth)), base-200, (ImageView) findViewById(R.id.bonus));
+        enemy = new Object( (((rand.nextInt(5)+4)*screenWidth)), base-350, (ImageView) findViewById(R.id.enemy));
+
+        bonus.img.setY(bonus.y);
+        enemy.img.setY(enemy.y);
+        obstacle.img.setY(obstacle.y);
+        floor.img.setY(floor.y);
+        floor2.img.setY(floor2.y);
+        map.img.setY(map.y);
+        map2.img.setY(map2.y);
+
+        enemy.img.setBackgroundResource(R.drawable.enemyanimation);
+        runEnemy = (AnimationDrawable) enemy.img.getBackground();
+        runEnemy.start();
+
         flag = 2;
-        man.setY(manY);
-        man.setX(manX);
+
         back.setX(screenWidth/3);
         sound.setX(screenWidth/2);
+
         menu.setVisibility(View.INVISIBLE);
         back.setVisibility(View.INVISIBLE);
-        sound.setVisibility(View.INVISIBLE);
+        sound.setVisibility(View.INVISIBLE);;
 
-        floor.setY(base+75);
-        floor2.setY(base+75);
-        bonus.setY(base - 200);
-        obstacle.setY(obstacleLeftY);
     }
 
 
-    public void saveData() {
+    private void saveData() {
         FileOutputStream fos;
         try {
             fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
@@ -371,7 +394,7 @@ public class game extends AppCompatActivity {
         }
     }
 
-    public int getInt(String s){
+    private int getInt(String s){
         return Integer.parseInt(s.replaceAll("[\\D]", ""));
     }
 
@@ -393,5 +416,18 @@ public class game extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mySong.pause();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mySong.start();
     }
 }

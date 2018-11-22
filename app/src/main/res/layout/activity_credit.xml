@@ -17,7 +17,8 @@
         android:layout_marginEnd="8dp"
         android:text="Vanja Plavsic
 Aness Menaa
-Kevin Harvanek"
+Kevin Harvanek
+freemusicarchive.org"
         android:textSize="50dp"
         android:textColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
