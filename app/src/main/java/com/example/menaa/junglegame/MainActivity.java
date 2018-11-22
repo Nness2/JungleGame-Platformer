@@ -37,12 +37,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mySong = MediaPlayer.create(MainActivity.this,R.raw.platformer);
         btScore = (Button) findViewById(R.id.btScore);
         btCredit = (Button) findViewById(R.id.btCredit);
         btLeave = (Button) findViewById(R.id.btLeave);
         btMusic = (Button) findViewById(R.id.btMusic);
         btPlay = (Button) findViewById(R.id.btPlay);
-        mySong = MediaPlayer.create(MainActivity.this,R.raw.platformer);
         btScore.setOnClickListener(btnScore);
         btCredit.setOnClickListener(btnCredit);
         btPlay.setOnClickListener(btnGame);
@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
     private View.OnClickListener btnGame = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            mStop = 1;
             Intent gameActivity = new Intent(MainActivity.this, game.class);
             startActivity(gameActivity);
         }
@@ -126,12 +127,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (musicStat%2 == 1){
+        if (musicStat%2 == 1)
             mySong.start();
-            if (mStop == 1)
-                mySong.seekTo(0);
-            mStop = 0;
-        }
     }
 
 }

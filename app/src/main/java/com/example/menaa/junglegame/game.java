@@ -48,6 +48,8 @@ public class game extends AppCompatActivity {
     private Object floor;
     private Object floor2;
     private Object map;
+    private Object hitbox;
+    private int ref;
 
     private int screenWidth;
     private int screenHeight;
@@ -58,12 +60,11 @@ public class game extends AppCompatActivity {
     private TextView score;
     private int scr;
     private ImageView menu;
-    private MediaPlayer mySong;
     private Random rand = new Random();
     private int base;
     private int state = 1;
-    private int musicState = 1;
     private int scoreState = 1;
+    private int prevFlag;
     private int[] tab = new int[10];
     private String FILENAME = "memo";
     private LinkedList<String> data = new LinkedList<String>();
@@ -73,8 +74,6 @@ public class game extends AppCompatActivity {
     private Rect rc2 = new Rect();
     private Rect rc3 = new Rect();
     private Rect rc4 = new Rect();
-    private Button back;
-    private Button sound;
     private Button jump;
     private Button brk;
 
@@ -83,49 +82,41 @@ public class game extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        getScore();
+        WindowManager wm = getWindowManager();
+        Display disp = wm.getDefaultDisplay();
+        Point size = new Point();
+        disp.getSize(size);
+        screenWidth = size.x;
+        screenHeight = size.y;
+        base = screenHeight-300;
 
+        man = new Object(50, base, (ImageView) findViewById(R.id.man));
+        map = new Object(0, 0, (ImageView) findViewById(R.id.map));
+        map2 = new Object(screenWidth, 0, (ImageView) findViewById(R.id.map2));
+        floor = new Object(0, base+75, (ImageView) findViewById(R.id.floor));
+        floor2 = new Object(screenWidth, base+75, (ImageView) findViewById(R.id.floor2));
+        obstacle = new Object(screenWidth*2, base, (ImageView) findViewById(R.id.obstacle));
+        bonus = new Object( (((rand.nextInt(1)+2)*screenWidth)), base-200, (ImageView) findViewById(R.id.bonus));
+        enemy = new Object( (((rand.nextInt(4)+3)*screenWidth)), base-350, (ImageView) findViewById(R.id.enemy));
+        hitbox = new Object( (((rand.nextInt(4)+3)*screenWidth)), base-350, (ImageView) findViewById(R.id.hitbox));
         score = (TextView) findViewById(R.id.score);
         jump = (Button) findViewById(R.id.jump);
         brk = (Button) findViewById(R.id.brk);
-        back = (Button) findViewById(R.id.back);
-        sound = (Button) findViewById(R.id.sound);
         menu = (ImageView) findViewById(R.id.menu);
-        mySong = MediaPlayer.create(game.this,R.raw.platformer);
+
 
         init();
         jump.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (state == 1) {
+                    isRun = 0;
+                    if (man.img.getY() == base)
+                        flag = 0;
 
-                isRun = 0;
-                if(man.img.getY() == base)
-                    flag = 0;
-
-                else
-                    flag = 3;
-            }
-        });
-
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-        sound.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                musicState++;
-                if (musicState%2 == 1){
-                    musicState = 1;
-                    mySong.start();
-                    sound.setBackgroundResource(R.drawable.sound);
-                }
-                if (musicState%2 == 0){
-                    musicState = 0;
-                    mySong.pause();
-                    sound.setBackgroundResource(R.drawable.sound_off);
+                    else
+                        flag = 3;
                 }
             }
         });
@@ -136,8 +127,6 @@ public class game extends AppCompatActivity {
 
                 if (state == 1) {
                     menu.setVisibility(View.VISIBLE);
-                    back.setVisibility(View.VISIBLE);
-                    sound.setVisibility(View.VISIBLE);
                     brk.setBackgroundResource(R.drawable.play);
 
                     state = 0;
@@ -148,8 +137,6 @@ public class game extends AppCompatActivity {
                 }
                 else{
                     menu.setVisibility(View.INVISIBLE);
-                    back.setVisibility(View.INVISIBLE);
-                    sound.setVisibility(View.INVISIBLE);
                     brk.setBackgroundResource(R.drawable.pause);
                     state = 1;
                 }
@@ -211,7 +198,7 @@ public class game extends AppCompatActivity {
         }
 
         if (enemy.img.getX() + enemy.img.getWidth() < 0){
-            enemy.x = screenWidth + (((rand.nextInt(5)+3)*screenWidth));
+            enemy.x = screenWidth + (((rand.nextInt(4)+3)*screenWidth));
         }
 
         if (floor.img.getX() + floor.img.getWidth() < 0){
@@ -224,7 +211,11 @@ public class game extends AppCompatActivity {
             floor.x = 0;
         }
 
+        if (man.img.getX() > 50 && man.img.getY() == base)
+            man.x -= 1;
+
         enemy.img.setX(enemy.x);
+        hitbox.img.setX(enemy.x);
         obstacle.img.setX(obstacle.x);
         floor.img.setX(floor.x);
         floor2.img.setX(floor2.x);
@@ -235,6 +226,8 @@ public class game extends AppCompatActivity {
 
         if (flag == 0){
             man.img.setBackgroundResource(R.drawable.r2);
+
+
             if (manJSpeed - 0.1 > 2)  // La vitesse va descendre jusqu'à 2
                 manJSpeed -= 0.1;     // Décrementation de la vitesse
             if (man.img.getY() > base - 350)
@@ -246,6 +239,7 @@ public class game extends AppCompatActivity {
 
         if (flag == 1) {
             man.img.setBackgroundResource(R.drawable.r1);
+
             if (man.img.getY() < base) {
                 manJSpeed += 0.1;    //Incrémentation de la vitesse (retombé)
                 man.y += manJSpeed;
@@ -267,17 +261,16 @@ public class game extends AppCompatActivity {
 
         if (flag == 3){
             man.img.setBackgroundResource(R.drawable.r10);
+
             if (man.img.getX() < screenWidth/3)
                 man.x += 10;
             else
                 flag = 1;
         }
 
-        if (man.img.getX() > 50 && man.img.getY() == base)
-            man.x -= 1;
-
         if (flag == 4) {
             man.img.setBackgroundResource(R.drawable.r4);
+
             if (man.y > base - 150)
                 man.y -= 5;
             else
@@ -314,7 +307,7 @@ public class game extends AppCompatActivity {
         obstacle.img.getHitRect(rc1);
         man.img.getHitRect(rc2);
         bonus.img.getHitRect(rc3);
-        enemy.img.getHitRect(rc4);
+        hitbox.img.getHitRect(rc4);
 
         if (Rect.intersects(rc1, rc2) || Rect.intersects(rc2, rc4)){
             state = 0;
@@ -337,45 +330,20 @@ public class game extends AppCompatActivity {
     }
 
     private void init () {
-        getScore();
-        WindowManager wm = getWindowManager();
-        Display disp = wm.getDefaultDisplay();
-        Point size = new Point();
-        disp.getSize(size);
-        screenWidth = size.x;
-        screenHeight = size.y;
-        base = screenHeight-300;
-
-        man = new Object(50, base, (ImageView) findViewById(R.id.man));
-        map = new Object(0, 0, (ImageView) findViewById(R.id.map));
-        map2 = new Object(screenWidth, 0, (ImageView) findViewById(R.id.map2));
-        floor = new Object(0, base+75, (ImageView) findViewById(R.id.floor));
-        floor2 = new Object(screenWidth, base+75, (ImageView) findViewById(R.id.floor2));
-        obstacle = new Object(screenWidth*2, base, (ImageView) findViewById(R.id.obstacle));
-        bonus = new Object( (((rand.nextInt(2)+2)*screenWidth)), base-200, (ImageView) findViewById(R.id.bonus));
-        enemy = new Object( (((rand.nextInt(5)+4)*screenWidth)), base-350, (ImageView) findViewById(R.id.enemy));
-
         bonus.img.setY(bonus.y);
         enemy.img.setY(enemy.y);
+        hitbox.img.setY(hitbox.y);
         obstacle.img.setY(obstacle.y);
         floor.img.setY(floor.y);
         floor2.img.setY(floor2.y);
         map.img.setY(map.y);
         map2.img.setY(map2.y);
-
         enemy.img.setBackgroundResource(R.drawable.enemyanimation);
         runEnemy = (AnimationDrawable) enemy.img.getBackground();
         runEnemy.start();
-
         flag = 2;
-
-        back.setX(screenWidth/3);
-        sound.setX(screenWidth/2);
-
+        prevFlag = -1;
         menu.setVisibility(View.INVISIBLE);
-        back.setVisibility(View.INVISIBLE);
-        sound.setVisibility(View.INVISIBLE);;
-
     }
 
 
@@ -418,16 +386,4 @@ public class game extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mySong.pause();
-    }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mySong.start();
-    }
 }
