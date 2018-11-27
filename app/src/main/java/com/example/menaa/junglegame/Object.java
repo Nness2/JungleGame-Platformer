@@ -7,7 +7,7 @@ public class Object {
     float y;
     ImageView img;
 
-    public Object(int x, int y, ImageView img) {
+    public Object(float x, float y, ImageView img) {
         this.img = img;
         this.x = x;
         this.y = y;
